@@ -28,10 +28,10 @@ jobs:
         working-directory: worker
         run: pip install -r requirements.txt
 
-      - name: Install UiPath CLI and Data Fabric tool
+      - name: Install UiPath CLI and Orchestrator tool
         run: |
           npm install -g @uipath/cli
-          uip tools install @uipath/data-fabric-tool
+          uip tools install @uipath/orchestrator-tool
 
       - name: Log in to UiPath (non-interactive, client credentials)
         env:
@@ -39,11 +39,14 @@ jobs:
           UIPATH_CLIENT_SECRET: ${{ secrets.UIPATH_CLIENT_SECRET }}
           UIPATH_TENANT_NAME: ${{ secrets.UIPATH_TENANT_NAME }}
         run: |
-          uip login --client-id "$UIPATH_CLIENT_ID" --client-secret "$UIPATH_CLIENT_SECRET" --tenant "$UIPATH_TENANT_NAME" --scope "DataFabric.Data.Read DataFabric.Data.Write DataFabric.Schema.Read" --output json
+          uip login --client-id "$UIPATH_CLIENT_ID" --client-secret "$UIPATH_CLIENT_SECRET" --tenant "$UIPATH_TENANT_NAME" --scope "OR.Assets" --output json
+          uip login status --output json
+
       - name: Loop the worker every 60s for ~20 minutes
         working-directory: worker
         env:
-          DF_ENTITY_ID: ${{ secrets.DF_ENTITY_ID }}
+          ASSET_KEY: ${{ secrets.ASSET_KEY }}
+          ASSET_FOLDER_PATH: ${{ secrets.ASSET_FOLDER_PATH }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
