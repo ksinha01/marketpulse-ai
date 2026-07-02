@@ -3,7 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { fetchLatestSnapshot } from './dataClient';
 import type { Snapshot } from './dataClient';
 
-const POLL_MS = 30_000; // Data Fabric read; the worker itself writes every N minutes on its own trigger
+const POLL_MS = 30_000; // Orchestrator Asset read; the worker itself writes every ~1 min on its own schedule
 
 export default function Dashboard() {
   const { sdk } = useAuth();

@@ -45,7 +45,7 @@ from app.services.options import (
     calculate_max_pain,
     generate_strategy,
 )
-from app.df_client import upsert_snapshot
+from app.asset_client import upsert_snapshot
 
 REQUIRED_MARKET_KEYS = ["nifty", "banknifty", "finnifty", "indiavix", "gift_nifty"]
 

@@ -7,10 +7,9 @@ robot, or a VM you manage:
 ```
 .github/workflows/marketpulse-worker.yml   GitHub Actions cron — the "always on" piece
 worker/   Python — runs the real market/news/scoring/prediction/options
-          logic on that schedule, writes one row to Data Fabric.
+          logic on that schedule, overwrites one Orchestrator Text asset.
 webapp/   UiPath Coded Web App (React + @uipath/uipath-typescript SDK) —
-          reads that row and renders the same MarketPulse dashboard.
-data-fabric/   entity + creation command for the row the worker writes to.
+          reads that asset and renders the same MarketPulse dashboard.
 ```
 
 Why two pieces, not one: a **Coded Web App is a static frontend hosted on
@@ -18,7 +17,21 @@ UiPath's CDN** — it has no server process, so it can't itself run yfinance
 polling every few minutes. The **worker** is the thing that's actually
 "24/7," and it runs on **GitHub's own hosted runners** on a cron schedule —
 not an unattended UiPath robot, not a VM you provision or patch. The web app
-just displays whatever the worker last wrote to Data Fabric.
+just displays whatever the worker last wrote.
+
+**Why an Orchestrator Asset and not Data Fabric:** Data Fabric was the
+original design, but its record-level API (`records list/insert/update`)
+rejected the worker's confidential-app (client-credentials) identity outright
+— `"You don't have permission to access the entity, field or record or you
+are using an unsupported robot type"` — in every configuration tested:
+correct DataFabric scopes, correct entity permissions (RBAC confirmed off),
+tenant IP restriction confirmed disabled, and even a restored real
+interactive-user session hit the identical error. Schema-level Data Fabric
+calls (`entities get/list`) worked fine for the same identity; only
+record-level calls failed. The same confidential-app identity was directly
+tested and confirmed working against Orchestrator Assets, so the whole
+snapshot is stored there instead — one Text asset (`MarketPulseSnapshot`)
+that the worker overwrites every cycle.
 
 ## 0. Before anything else — rotate your credentials
 
@@ -36,26 +49,33 @@ This build is **signals/analysis only** — nothing here places real orders.
 Keep it that way unless you deliberately design, review, and gate an
 order-placement path behind its own explicit human approval step.
 
-## 1. Create the Data Fabric entity
+## 1. Create the Orchestrator asset
 
 ```bash
-uip tools install @uipath/data-fabric-tool   # once
-uip login status --output json               # confirm logged in
+uip tools install @uipath/orchestrator-tool   # once
+uip login status --output json                # confirm logged in
 
-cd data-fabric
-ENTITY_ID=$(uip df entities create "MarketPulseSnapshot" --file entity-body.json --output json \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['Data']['Id'])")
-echo "Entity ID: $ENTITY_ID"
+uip or assets create "MarketPulseSnapshot" "{}" --folder-path "Shared" --type Text --output json
+
+# Note the Key (a UUID) from that response's Data field, or look it up:
+ASSET_KEY=$(uip or assets list --folder-path "Shared" --name "MarketPulseSnapshot" --output json \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['Data'][0]['Key'])")
+echo "Asset key: $ASSET_KEY"
 ```
 
-That's the value both `worker/.env.production`'s `DF_ENTITY_ID` and
-`webapp/.env`'s `VITE_DF_ENTITY_ID` need. Full field list and the equivalent
-manual (web UI) steps are in `data-fabric/entity-schema.md`.
+Use whatever folder path fits your tenant — `Shared` is the top-level
+default folder in most tenants. `$ASSET_KEY` is the value both
+`worker/.env.production`'s `ASSET_KEY` and the `ASSET_KEY` GitHub secret
+need — note it's the asset's **key** (a UUID), not its name; `update` and
+`get-asset-value` both require the key.
 
 ## 2. Deploy the worker as a GitHub Actions scheduled workflow
 
 No unattended robot, no VM. `.github/workflows/marketpulse-worker.yml` uses
-GitHub's own hosted runners as the "always on" piece.
+GitHub's own hosted runners as the "always on" piece, authenticating as your
+confidential/client-credentials External Application — confirmed working
+against Orchestrator Assets (see the architecture note above for why this
+identity was tested against both Data Fabric and Assets before landing here).
 
 **~1-minute cadence, on a public repo.** GitHub Actions cannot schedule cron
 jobs more often than every 5 minutes — that's a hard platform limit. To get
@@ -68,10 +88,9 @@ This only stays free if **the repo is public**: GitHub gives public repos
 unlimited Actions minutes, but private repos get a small free quota (2,000
 min/month on the Free plan) then bill per minute — and near-continuous
 20-minutes-per-19-minutes looping burns that quota in hours, not days.
-Making the repo public exposes the **code** (this worker's logic, the
-webapp's source) to anyone — it does **not** expose secrets; `UIPATH_CLIENT_SECRET`,
-API keys, etc. stay encrypted in GitHub Secrets and are never printed or
-committed regardless of visibility. Before you push, double check there's
+Making the repo public exposes the **code** to anyone — it does **not**
+expose secrets; they stay encrypted in GitHub Secrets and are never printed
+or committed regardless of visibility. Before you push, double check there's
 nothing else in this project (comments, sample data, filenames) you wouldn't
 want public.
 
@@ -81,30 +100,24 @@ want public.
 gh repo create marketpulse-ai --public --source=. --push
 ```
 
-**2. Set the secrets** — the workflow reads these as env vars at runtime;
-nothing sensitive is ever committed:
+**2. Create a confidential External Application** in UiPath Admin
+(client-credentials grant, not the browser-based one the web app uses),
+scoped to `OR.Assets`. Set its ID/secret/tenant as secrets:
 
 ```bash
-# needs GitHub CLI: https://cli.github.com  (gh auth login first)
-gh secret set UIPATH_BASE_URL       --body "https://cloud.uipath.com"
-gh secret set UIPATH_ORG_NAME       --body "<your-org-slug>"
-gh secret set UIPATH_TENANT_NAME    --body "<your-tenant>"
-gh secret set UIPATH_CLIENT_ID      --body "<confidential-oauth-client-id>"
-gh secret set UIPATH_CLIENT_SECRET  --body "<confidential-oauth-client-secret>"
-gh secret set UIPATH_FOLDER_ID      --body "<orchestrator-folder-id>"
-gh secret set DF_ENTITY_ID          --body "$ENTITY_ID"
-gh secret set OPENAI_API_KEY        --body "<rotated-key>"
-gh secret set DHAN_CLIENT_ID        --body "<rotated-client-id>"
-gh secret set DHAN_ACCESS_TOKEN     --body "<rotated-token>"
+gh secret set UIPATH_CLIENT_ID
+gh secret set UIPATH_CLIENT_SECRET
+gh secret set UIPATH_TENANT_NAME
+gh secret set ASSET_KEY              # the UUID from Step 1
+gh secret set ASSET_FOLDER_PATH      # e.g. "Shared"
+gh secret set OPENAI_API_KEY         # only if keeping this integration — rotate first (Step 0)
+gh secret set DHAN_CLIENT_ID         # only if keeping this integration — rotate first (Step 0)
+gh secret set DHAN_ACCESS_TOKEN      # only if keeping this integration — rotate first (Step 0)
 ```
 
-`UIPATH_CLIENT_ID` / `UIPATH_CLIENT_SECRET` come from a **confidential**
-External Application (client-credentials grant, not the browser-based one
-the web app uses) scoped to
-`DataFabric.Data.Read DataFabric.Data.Write DataFabric.Schema.Read`.
-`DF_ENTITY_ID` is the `$ENTITY_ID` captured in Step 1. Only set the
-`OPENAI_API_KEY` / `DHAN_*` secrets if you're keeping those integrations
-enabled — and rotate them first (see Step 0).
+Running `gh secret set NAME` with no `--body` prompts you to paste the value
+interactively — this avoids both shell-quoting issues with special
+characters like `!` and leaving secret values in your terminal history.
 
 **3. Trigger a first run to confirm it works:**
 
@@ -115,20 +128,19 @@ gh run watch                              # follow it live
 
 After that, GitHub's scheduler fires a new 20-minute looping run every 19
 minutes on its own — nothing to keep running locally, and within each run
-the dashboard refreshes about once a minute. First cycle creates the Data
-Fabric row; every cycle after that updates it (`df_client.py` looks up the
-existing row id and upserts). Adjust the loop's `sleep 60` / cron expression
-in the workflow file if you want a different cadence — check GitHub's [cron
-syntax docs](https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#schedule) —
-note that scheduled workflows are paused automatically if the repo has no
+the dashboard-backing asset refreshes about once a minute. Adjust the loop's
+`sleep 60` / cron expression in the workflow file if you want a different
+cadence — check GitHub's [cron syntax docs](https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#schedule).
+Note that scheduled workflows are paused automatically if the repo has no
 activity for 60 days, so you'll need to push a commit or manually re-enable
 it if that happens.
 
 **Local smoke test before pushing:**
 
 ```bash
+uip login --client-id <ID> --client-secret <SECRET> --tenant <TENANT> --scope "OR.Assets"
 cd worker
-cp .env.example .env.production   # fill in the same values as the secrets above
+cp .env.example .env.production   # fill in ASSET_KEY / ASSET_FOLDER_PATH + any API keys
 python -m app.worker
 ```
 
@@ -152,10 +164,11 @@ uip login                      # opens a browser
 ```
 
 Create an OAuth **External Application** (interactive/browser type) with
-redirect URI `http://localhost:5173` and scope
-`DataFabric.Data.Read DataFabric.Schema.Read`, then fill in `webapp/.env`
-(copy from `.env.example`) and `webapp/uipath.json` with that Client ID, your
-org, tenant, base URL, and the `DF_ENTITY_ID` from step 1.
+redirect URI `http://localhost:5173` and scope `OR.Assets.Read` (read-only —
+the web app only displays the snapshot, it never writes), then fill in
+`webapp/.env` (copy from `.env.example`) and `webapp/uipath.json` with that
+Client ID, your org, tenant, base URL, and the folder path from Step 1
+(`VITE_ASSET_FOLDER_PATH`).
 
 ```bash
 cd webapp
@@ -169,7 +182,8 @@ uip codedapp deploy -n marketpulse --folder-key <GUID>
 ```
 
 The final command prints the live app URL — that's the always-on dashboard,
-refreshing from Data Fabric every 30s, independent of anyone's laptop.
+refreshing from the Orchestrator asset every 30s, independent of anyone's
+laptop.
 
 ## What changed from the original app
 
@@ -178,9 +192,14 @@ refreshing from Data Fabric every 30s, independent of anyone's laptop.
   `scoring.py`, `prediction.py`, `decision.py`, `alerts.py`, `options.py`,
   `trade.py`, `sector.py`, `insight.py`, `dhan_options.py`) reused as-is.
 - The `/ws` websocket heartbeat and Redis cache (`core/cache.py`) were unused
-  by any service and dropped — Data Fabric is now the shared state instead.
+  by any service and dropped — a single Orchestrator asset is now the shared
+  state instead.
 - `frontend/src/App.js` (axios → `localhost:8000`) → `webapp/src/Dashboard.tsx`
-  (UiPath SDK → Data Fabric), same layout and colors.
+  (UiPath SDK → Orchestrator Asset), same layout and colors.
 - Trade engine output is now explicitly labeled "informational only" in the UI.
 - Scheduling runs on GitHub Actions cron rather than an unattended UiPath
   robot or a self-managed VM/server, per your preference — see Step 2.
+- Storage is an Orchestrator Text asset, not Data Fabric — Data Fabric's
+  record-level API rejected the confidential-app identity in every
+  configuration tested (see the architecture note near the top); Orchestrator
+  Assets were confirmed working with the same identity.

@@ -1,8 +1,8 @@
-import { Entities } from '@uipath/uipath-typescript/entities';
-import type { EntityRecord } from '@uipath/uipath-typescript/entities';
+import { Assets } from '@uipath/uipath-typescript/assets';
 import type { UiPath } from '@uipath/uipath-typescript/core';
 
-const ENTITY_ID = import.meta.env.VITE_DF_ENTITY_ID as string;
+const ASSET_NAME = 'MarketPulseSnapshot';
+const ASSET_FOLDER_PATH = (import.meta.env.VITE_ASSET_FOLDER_PATH as string) || 'Shared';
 
 export interface Snapshot {
   sentiment: string;
@@ -34,14 +34,32 @@ function safeParse<T>(raw: unknown, fallback: T): T {
 }
 
 /**
- * Reads the single upserted snapshot row the worker maintains.
- * pageSize: 1 is always "the latest" because the worker writes one fixed row.
+ * Reads the single MarketPulseSnapshot Orchestrator asset. The worker always
+ * overwrites this one asset's value with the full snapshot as a JSON string
+ * (with several fields — MarketJson, NewsJson, etc. — being JSON-encoded
+ * strings themselves, hence the double JSON.parse below).
+ *
+ * Data Fabric was the original design here, but its record-level API
+ * rejected the worker's confidential-app identity outright ("unsupported
+ * robot type") in every configuration tested — a Data-Fabric-specific
+ * platform behavior, confirmed by direct testing (correct scopes, correct
+ * entity permissions, IP restriction confirmed disabled). The identical
+ * identity works fine against Orchestrator Assets, so the whole snapshot
+ * lives in one asset instead of a Data Fabric entity row.
  */
 export async function fetchLatestSnapshot(sdk: UiPath): Promise<Snapshot | null> {
-  const entities = new Entities(sdk);
-  const result: any = await entities.getAllRecords(ENTITY_ID, { pageSize: 1 } as any);
-  const items: EntityRecord[] = result?.items ?? result ?? [];
-  const row: any = items[0];
+  const assets = new Assets(sdk);
+  const asset: any = await assets.getByName(ASSET_NAME, { folderPath: ASSET_FOLDER_PATH });
+
+  // Field casing from the SDK response isn't 100% confirmed against the raw
+  // Orchestrator API's PascalCase (StringValue) — trying the likely SDK
+  // camelCase form first, falling back to PascalCase if that's actually
+  // what comes back. If both come back undefined, this needs a console.log
+  // of the raw `asset` object to see its real shape.
+  const raw: string | undefined = asset?.stringValue ?? asset?.StringValue ?? asset?.value ?? asset?.Value;
+  if (!raw) return null;
+
+  const row = safeParse<any>(raw, null);
   if (!row) return null;
 
   return {
