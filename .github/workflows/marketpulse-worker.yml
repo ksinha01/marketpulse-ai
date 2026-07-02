@@ -5,6 +5,9 @@ on:
     - cron: "*/19 * * * *"
   workflow_dispatch: {}
 
+permissions:
+  contents: write   # needed so the worker can commit/push data/snapshot.json
+
 concurrency:
   group: marketpulse-worker
   cancel-in-progress: false
@@ -15,6 +18,8 @@ jobs:
     timeout-minutes: 21
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -42,6 +47,11 @@ jobs:
           uip login --client-id "$UIPATH_CLIENT_ID" --client-secret "$UIPATH_CLIENT_SECRET" --tenant "$UIPATH_TENANT_NAME" --scope "OR.Assets" --output json
           uip login status --output json
 
+      - name: Configure git identity for snapshot commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Loop the worker every 60s for ~20 minutes
         working-directory: worker
         env:
@@ -50,10 +60,25 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+          SNAPSHOT_FILE: ${{ github.workspace }}/data/snapshot.json
         run: |
           END=$((SECONDS + 20*60))
           while [ $SECONDS -lt $END ]; do
             echo "=== cycle at $(date -u +%H:%M:%S) UTC ==="
             python -m app.worker || echo "cycle failed, continuing to next tick"
+
+            cd "$GITHUB_WORKSPACE"
+            if [ -f data/snapshot.json ] && [ -n "$(git status --porcelain -- data/snapshot.json)" ]; then
+              git add data/snapshot.json
+              LAST_MSG=$(git log -1 --pretty=%s)
+              if [ "$LAST_MSG" = "Update snapshot data [skip ci]" ]; then
+                git commit --amend --no-edit
+              else
+                git commit -m "Update snapshot data [skip ci]"
+              fi
+              git push --force-with-lease || echo "snapshot push failed, continuing anyway"
+            fi
+            cd - > /dev/null
+
             sleep 60
           done
