@@ -1,127 +1,130 @@
 {
-  "sentiment": "\ud83d\udfe0 WEAK BEARISH",
-  "score": 0.5,
-  "decisionText": {
-    "signal": "STRONG SELL",
-    "type": "CONFIRMED",
-    "message": "Global + Intraday aligned bearish",
-    "action": "Buy Puts aggressively"
-  },
-  "predictionTrend": "\ud83d\udcc9 STRONG GAP DOWN",
-  "predictionConfidence": "High",
-  "alertType": "\u26a0\ufe0f MIXED SIGNAL",
-  "alertMessage": "News and prediction are conflicting",
-  "alertAction": "Trade cautiously",
-  "tradeType": "PUT",
-  "tradeReason": "Bearish trend + gap down",
+  "sentiment": "\ud83d\udfe2 BULLISH",
+  "score": 45.0,
+  "decisionText": "Global + Intraday aligned bullish",
+  "predictionTrend": "\ud83d\udcc8 GAP UP",
+  "predictionConfidence": "Medium",
+  "alertType": "\ud83d\ude80 STRONG BULLISH",
+  "alertMessage": "Bullish news + Gap Up expected",
+  "alertAction": "Look for buying opportunities",
+  "tradeType": "CALL",
+  "tradeReason": "Bullish trend + gap up",
   "market": {
     "sp500": {
-      "price": 7440.98,
-      "change": -0.72
+      "price": 7483.24,
+      "change": -0.16
     },
     "nasdaq": {
-      "price": 25694.82,
-      "change": -1.35
+      "price": 25832.67,
+      "change": -0.82
     },
     "vix": {
-      "price": 17.03,
-      "change": -0.12
+      "price": 16.15,
+      "change": -5.28
     },
     "usd_inr": {
-      "price": 95.38,
-      "change": 0.15
+      "price": 95.21,
+      "change": -0.18
     },
     "us10y": {
-      "price": 4.49,
-      "change": -0.36
+      "price": 4.48,
+      "change": -0.4
     },
     "nifty": {
-      "price": 24175.7,
-      "change": 0.71
+      "price": 24359.05,
+      "change": 0.76
     },
     "banknifty": {
-      "price": 58031.65,
-      "change": 0
+      "price": 58161.7,
+      "change": 0.22
     },
     "finnifty": {
-      "price": 26862.4,
-      "change": 0.24
+      "price": 27050.15,
+      "change": 0.7
     },
     "indiavix": {
-      "price": 12.29,
-      "change": -7.21
+      "price": 12.03,
+      "change": -2.07
     },
     "gift_nifty": {
-      "price": 24175.7,
-      "change": -0.8
+      "price": 24359.05,
+      "change": 0.66
     },
     "sectors": {
-      "IT": 3.15,
-      "AUTO": 0.53,
-      "FMCG": 0.31,
-      "METAL": 0.43,
-      "PHARMA": 0.03,
-      "ENERGY": -0.27,
-      "BANK": -0.18
+      "IT": -0.1,
+      "AUTO": -0.8,
+      "FMCG": -0.18,
+      "METAL": 0.62,
+      "PHARMA": 0.49,
+      "ENERGY": -0.57,
+      "BANK": -0.37
     }
   },
   "sectors": {
-    "IT": 3.15,
-    "AUTO": 0.53,
-    "FMCG": 0.31,
-    "METAL": 0.43,
-    "PHARMA": 0.03,
-    "ENERGY": -0.27,
-    "BANK": -0.18
+    "IT": -0.1,
+    "AUTO": -0.8,
+    "FMCG": -0.18,
+    "METAL": 0.62,
+    "PHARMA": 0.49,
+    "ENERGY": -0.57,
+    "BANK": -0.37
   },
   "news": [
     {
-      "title": "TPIsoftware Adopts Intel (INTC) Processors and GPUs to Power Enterprise AI Solutions",
-      "impact": "Bullish",
-      "score": 2.4,
-      "category": "geopolitics",
-      "weight": 2,
-      "time": "2026-07-02T17:32:36Z"
-    },
-    {
-      "title": "SAP SE (SAP) Among Jefferies\u2019 Top European Software Stock Picks",
-      "impact": "Bearish",
-      "score": -2.4,
-      "category": "geopolitics",
-      "weight": 2,
-      "time": "2026-07-02T17:08:09Z"
-    },
-    {
-      "title": "Workato Expands AWS (AMZN) Partnership to Scale Enterprise AI Production",
-      "impact": "Bullish",
-      "score": 1.8,
-      "category": "equities",
-      "weight": 1.5,
-      "time": "2026-07-02T17:32:30Z"
-    },
-    {
-      "title": "Daily Spotlight: Payrolls Rise 57,000",
+      "title": "Piper Sandler Raises Price Target on Kimberly-Clark Corporation (KMB) on Productivity Gains",
       "impact": "Bullish",
       "score": 1.5,
       "category": "equities",
       "weight": 1.5,
-      "time": "2026-07-02T13:20:54Z"
+      "time": "2026-07-01T15:57:55Z"
     },
     {
-      "title": "Analyst Sees Slower Growth Tempering Outlook for Adobe (ADBE)",
+      "title": "UBS Reaffirms Buy Rating on Broadcom (AVGO) Amid AI ASIC Demand and OpenAI, Anthropic Growth",
       "impact": "Bullish",
-      "score": 1.2,
-      "category": "general",
-      "weight": 1,
-      "time": "2026-07-02T17:12:11Z"
+      "score": 1.5,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-01T15:58:00Z"
     },
     {
-      "title": "Stock market today: Dow rises, S&P 500 and Nasdaq dip after June jobs report falls short",
+      "title": "Wolfe Research Calls Palantir Technologies (PLTR) Enterprise AI Leader Despite Premium Valuation",
+      "impact": "Bullish",
+      "score": 1.5,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-01T15:58:01Z"
+    },
+    {
+      "title": "Evercore ISI Reiterates Outperform Rating on Meta Platforms (META) as AI Subscriptions Drive Growth",
+      "impact": "Bullish",
+      "score": 1.5,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-01T15:58:24Z"
+    },
+    {
+      "title": "UBS Highlights Plains All American (PAA) Growth Projects and Capital Expansion",
+      "impact": "Bullish",
+      "score": 1.5,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-01T15:58:18Z"
+    },
+    {
+      "title": "Paychex Inc. (PAYX) Reports Strong Results as AI Platform Supports Future Growth",
+      "impact": "Bullish",
+      "score": 1.5,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-01T15:58:15Z"
+    },
+    {
+      "title": "KBW and Piper Sandler Highlight CME Group (CME) Leadership Transition and Growth Outlook",
       "impact": "Bullish",
       "score": 1,
       "category": "general",
       "weight": 1,
-      "time": "2026-07-01T22:31:36Z"
+      "time": "2026-07-01T15:57:53Z"
     }
   ],
   "checklist": [
@@ -139,7 +142,7 @@
     },
     {
       "name": "Momentum",
-      "signal": "Divergence (Caution)"
+      "signal": "Strong Bullish Alignment"
     },
     {
       "name": "VIX",
@@ -151,16 +154,16 @@
     },
     {
       "name": "High Impact News",
-      "signal": "Score: 5.5 | Events: 2"
+      "signal": "Score: 10.0 | Events: 0"
     }
   ],
   "strategy": {
-    "strategy": "Bear Put Spread",
-    "setup": "Buy ATM PE, Sell OTM PE",
+    "strategy": "Bull Call Spread",
+    "setup": "Buy ATM CE, Sell OTM CE",
     "confidence": "High",
-    "execution": "Buy ATM Put on breakdown",
-    "reason": "Downtrend confirmation"
+    "execution": "Buy ATM Call near support",
+    "reason": "Trend + sentiment aligned"
   },
-  "insight": "Market is under pressure with bearish signals. Strength seen in: Nifty Trend. Risks from: Global Cues. ",
-  "snapshotTime": "2026-07-02T18:05:39.156355+00:00"
+  "insight": "Market shows strong bullish momentum. Strength seen in: Nifty Trend, Momentum. Risks from: Global Cues. ",
+  "snapshotTime": "2026-07-03T04:04:22.701345+00:00"
 }
