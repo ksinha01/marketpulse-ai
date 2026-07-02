@@ -1,0 +1,4 @@
+{
+  "scope": "DataFabric.Data.Read DataFabric.Schema.Read",
+  "clientId": "REPLACE_WITH_CLIENT_ID"
+}

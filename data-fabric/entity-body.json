@@ -1,0 +1,27 @@
+{
+  "displayName": "MarketPulse Snapshot",
+  "description": "Latest MarketPulse worker refresh cycle",
+  "fields": [
+    {"fieldName": "Sentiment",            "type": "STRING",           "lengthLimit": 50},
+    {"fieldName": "Score",                "type": "INTEGER"},
+    {"fieldName": "DecisionText",         "type": "STRING",           "lengthLimit": 500},
+    {"fieldName": "PredictionTrend",      "type": "STRING",           "lengthLimit": 50},
+    {"fieldName": "PredictionConfidence", "type": "STRING",           "lengthLimit": 50},
+    {"fieldName": "AlertType",            "type": "STRING",           "lengthLimit": 50},
+    {"fieldName": "AlertMessage",         "type": "MULTILINE_TEXT",   "lengthLimit": 2000},
+    {"fieldName": "AlertAction",          "type": "STRING",           "lengthLimit": 500},
+    {"fieldName": "StrategyConfidence",   "type": "STRING",           "lengthLimit": 50},
+    {"fieldName": "Pcr",                  "type": "DECIMAL",          "decimalPrecision": 4},
+    {"fieldName": "MaxPain",              "type": "DECIMAL",          "decimalPrecision": 2},
+    {"fieldName": "TradeType",            "type": "STRING",           "lengthLimit": 50},
+    {"fieldName": "TradeReason",          "type": "MULTILINE_TEXT",   "lengthLimit": 2000},
+    {"fieldName": "MarketJson",           "type": "MULTILINE_TEXT",   "lengthLimit": 10000},
+    {"fieldName": "SectorsJson",          "type": "MULTILINE_TEXT",   "lengthLimit": 10000},
+    {"fieldName": "NewsJson",             "type": "MULTILINE_TEXT",   "lengthLimit": 10000},
+    {"fieldName": "ChecklistJson",        "type": "MULTILINE_TEXT",   "lengthLimit": 10000},
+    {"fieldName": "OptionsJson",          "type": "MULTILINE_TEXT",   "lengthLimit": 10000},
+    {"fieldName": "StrategyJson",         "type": "MULTILINE_TEXT",   "lengthLimit": 10000},
+    {"fieldName": "InsightText",          "type": "MULTILINE_TEXT",   "lengthLimit": 2000},
+    {"fieldName": "SnapshotTime",         "type": "DATETIME_WITH_TZ"}
+  ]
+}

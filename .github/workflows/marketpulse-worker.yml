@@ -1,0 +1,70 @@
+name: marketpulse-worker
+
+# GitHub Actions cannot schedule cron jobs more often than every 5 minutes —
+# that's a platform limit, not something configurable here. To approximate a
+# ~1-minute refresh cadence anyway, each scheduled run loops the worker every
+# 60 seconds internally for ~20 minutes, and a new run kicks off every 19
+# minutes so the windows overlap with no gap. This requires a PUBLIC repo to
+# stay free — GitHub only gives unlimited Actions minutes to public repos;
+# private repos are billed per minute once the small monthly free quota is
+# used, and near-continuous 24/7 looping like this burns that quota in hours.
+# Secrets (below) stay hidden regardless of repo visibility — only the code
+# in this repo becomes public, never secret values.
+on:
+  schedule:
+    - cron: "*/19 * * * *"
+  workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
+
+concurrency:
+  group: marketpulse-worker
+  cancel-in-progress: false   # don't kill a run that's mid-write to Data Fabric;
+                               # brief overlap with the next tick is harmless
+                               # since the worker upserts the same row.
+
+jobs:
+  run-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 21
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: worker
+        run: pip install -r requirements.txt
+
+      - name: Install UiPath CLI and Data Fabric tool
+        run: |
+          npm install -g @uipath/cli
+          uip tools install @uipath/data-fabric-tool
+
+      - name: Log in to UiPath (non-interactive, client credentials)
+        env:
+          UIPATH_CLIENT_ID: ${{ secrets.UIPATH_CLIENT_ID }}
+          UIPATH_CLIENT_SECRET: ${{ secrets.UIPATH_CLIENT_SECRET }}
+          UIPATH_TENANT_NAME: ${{ secrets.UIPATH_TENANT_NAME }}
+        run: |
+          uip login --client-id "$UIPATH_CLIENT_ID" --client-secret "$UIPATH_CLIENT_SECRET" --tenant "$UIPATH_TENANT_NAME" --output json
+          uip login status --output json
+
+      - name: Loop the worker every 60s for ~20 minutes
+        working-directory: worker
+        env:
+          DF_ENTITY_ID: ${{ secrets.DF_ENTITY_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
+          DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+        run: |
+          END=$((SECONDS + 20*60))
+          while [ $SECONDS -lt $END ]; do
+            echo "=== cycle at $(date -u +%H:%M:%S) UTC ==="
+            python -m app.worker || echo "cycle failed, continuing to next tick"
+            sleep 60
+          done
