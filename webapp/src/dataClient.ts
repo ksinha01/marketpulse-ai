@@ -1,8 +1,15 @@
-import { Assets } from '@uipath/uipath-typescript/assets';
-import type { UiPath } from '@uipath/uipath-typescript/core';
-
-const ASSET_NAME = 'MarketPulseSnapshot';
-const ASSET_FOLDER_PATH = (import.meta.env.VITE_ASSET_FOLDER_PATH as string) || 'Shared';
+// Reads the snapshot as a plain JSON file from GitHub, NOT via the UiPath
+// SDK. The UiPath Orchestrator Assets OData API doesn't send CORS headers
+// for this app's origin — confirmed via browser devtools ("No
+// 'Access-Control-Allow-Origin' header is present on the requested
+// resource"), not assumed — so a direct browser fetch to Orchestrator is
+// blocked regardless of auth/scope. raw.githubusercontent.com sends
+// `Access-Control-Allow-Origin: *` on every file, sidestepping that
+// entirely. The worker still writes the "official" copy to an Orchestrator
+// asset too (see worker/app/asset_client.py) — this is purely a
+// browser-readable mirror of the same data, committed to the repo each
+// cycle by the worker's GitHub Actions job.
+const SNAPSHOT_URL = 'https://raw.githubusercontent.com/ksinha01/marketpulse-ai/main/data/snapshot.json';
 
 export interface Snapshot {
   sentiment: string;
@@ -24,61 +31,14 @@ export interface Snapshot {
   snapshotTime: string;
 }
 
-function safeParse<T>(raw: unknown, fallback: T): T {
-  if (typeof raw !== 'string' || !raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
+export async function fetchLatestSnapshot(): Promise<Snapshot | null> {
+  // Cache-bust — raw.githubusercontent.com and intermediate CDNs cache
+  // aggressively; without this the dashboard could show stale data well
+  // past when the worker actually updated it.
+  const resp = await fetch(`${SNAPSHOT_URL}?t=${Date.now()}`, { cache: 'no-store' });
+  if (!resp.ok) {
+    if (resp.status === 404) return null; // worker hasn't written a snapshot yet
+    throw new Error(`Failed to fetch snapshot: ${resp.status}`);
   }
-}
-
-/**
- * Reads the single MarketPulseSnapshot Orchestrator asset. The worker always
- * overwrites this one asset's value with the full snapshot as a JSON string
- * (with several fields — MarketJson, NewsJson, etc. — being JSON-encoded
- * strings themselves, hence the double JSON.parse below).
- *
- * Data Fabric was the original design here, but its record-level API
- * rejected the worker's confidential-app identity outright ("unsupported
- * robot type") in every configuration tested — a Data-Fabric-specific
- * platform behavior, confirmed by direct testing (correct scopes, correct
- * entity permissions, IP restriction confirmed disabled). The identical
- * identity works fine against Orchestrator Assets, so the whole snapshot
- * lives in one asset instead of a Data Fabric entity row.
- */
-export async function fetchLatestSnapshot(sdk: UiPath): Promise<Snapshot | null> {
-  const assets = new Assets(sdk);
-  const asset: any = await assets.getByName(ASSET_NAME, { folderPath: ASSET_FOLDER_PATH });
-
-  // Field casing from the SDK response isn't 100% confirmed against the raw
-  // Orchestrator API's PascalCase (StringValue) — trying the likely SDK
-  // camelCase form first, falling back to PascalCase if that's actually
-  // what comes back. If both come back undefined, this needs a console.log
-  // of the raw `asset` object to see its real shape.
-  const raw: string | undefined = asset?.stringValue ?? asset?.StringValue ?? asset?.value ?? asset?.Value;
-  if (!raw) return null;
-
-  const row = safeParse<any>(raw, null);
-  if (!row) return null;
-
-  return {
-    sentiment: row.Sentiment ?? '',
-    score: row.Score ?? 0,
-    decisionText: row.DecisionText ?? '',
-    predictionTrend: row.PredictionTrend ?? '',
-    predictionConfidence: row.PredictionConfidence ?? '',
-    alertType: row.AlertType ?? '',
-    alertMessage: row.AlertMessage ?? '',
-    alertAction: row.AlertAction ?? '',
-    tradeType: row.TradeType ?? '',
-    tradeReason: row.TradeReason ?? '',
-    market: safeParse(row.MarketJson, {}),
-    sectors: safeParse(row.SectorsJson, {}),
-    news: safeParse(row.NewsJson, []),
-    checklist: safeParse(row.ChecklistJson, []),
-    strategy: safeParse(row.StrategyJson, {}),
-    insight: row.InsightText ?? '',
-    snapshotTime: row.SnapshotTime ?? '',
-  };
+  return (await resp.json()) as Snapshot;
 }

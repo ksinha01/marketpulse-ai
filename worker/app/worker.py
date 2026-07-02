@@ -47,6 +47,16 @@ from app.services.options import (
 )
 from app.asset_client import upsert_snapshot
 
+# Where to also write the snapshot as a plain JSON file, committed to the
+# repo — the web app reads THIS (via raw.githubusercontent.com) instead of
+# calling UiPath's Orchestrator OData API directly from the browser, because
+# that API doesn't send CORS headers for the Coded Web App's origin (browser
+# fetch gets blocked with "No 'Access-Control-Allow-Origin' header is present
+# on the requested resource" — confirmed via browser devtools, not assumed).
+# The Orchestrator asset write above still happens too; this is an additional
+# read-friendly copy, not a replacement.
+SNAPSHOT_FILE = os.environ.get("SNAPSHOT_FILE")
+
 REQUIRED_MARKET_KEYS = ["nifty", "banknifty", "finnifty", "indiavix", "gift_nifty"]
 
 
@@ -119,10 +129,46 @@ def build_snapshot() -> dict:
     }
 
 
+def write_snapshot_file(snapshot: dict) -> None:
+    """Write a cleanly-nested copy of the snapshot to SNAPSHOT_FILE, if set.
+
+    The asset-bound `snapshot` dict has several fields (MarketJson, NewsJson,
+    etc.) pre-serialized as JSON *strings*, matching the old Data Fabric
+    per-field schema. For a plain file there's no reason to double-encode —
+    this writes proper nested objects instead, so the web app can parse the
+    file once instead of parsing each field a second time.
+    """
+    if not SNAPSHOT_FILE:
+        return
+    clean = {
+        "sentiment": snapshot["Sentiment"],
+        "score": snapshot["Score"],
+        "decisionText": snapshot["DecisionText"],
+        "predictionTrend": snapshot["PredictionTrend"],
+        "predictionConfidence": snapshot["PredictionConfidence"],
+        "alertType": snapshot["AlertType"],
+        "alertMessage": snapshot["AlertMessage"],
+        "alertAction": snapshot["AlertAction"],
+        "tradeType": snapshot["TradeType"],
+        "tradeReason": snapshot["TradeReason"],
+        "market": json.loads(snapshot["MarketJson"]),
+        "sectors": json.loads(snapshot["SectorsJson"]),
+        "news": json.loads(snapshot["NewsJson"]),
+        "checklist": json.loads(snapshot["ChecklistJson"]),
+        "strategy": json.loads(snapshot["StrategyJson"]),
+        "insight": snapshot["InsightText"],
+        "snapshotTime": snapshot["SnapshotTime"],
+    }
+    path = Path(SNAPSHOT_FILE)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(clean, indent=2))
+
+
 def main() -> int:
     try:
         snapshot = build_snapshot()
         upsert_snapshot(snapshot)
+        write_snapshot_file(snapshot)
         print(f"✅ Snapshot written at {snapshot['SnapshotTime']}")
         return 0
     except Exception:

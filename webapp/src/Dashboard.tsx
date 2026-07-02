@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from './hooks/useAuth';
 import { fetchLatestSnapshot } from './dataClient';
 import type { Snapshot } from './dataClient';
 
-const POLL_MS = 30_000; // Orchestrator Asset read; the worker itself writes every ~1 min on its own schedule
+const POLL_MS = 30_000; // GitHub raw file read; the worker itself writes every ~1 min on its own schedule
 
 export default function Dashboard() {
-  const { sdk } = useAuth();
   const [data, setData] = useState<Snapshot | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -15,7 +13,7 @@ export default function Dashboard() {
 
     const load = async () => {
       try {
-        const snap = await fetchLatestSnapshot(sdk);
+        const snap = await fetchLatestSnapshot();
         if (!cancelled) {
           setData(snap);
           setErr(snap ? null : 'No snapshot yet — has the worker run at least once?');
@@ -31,7 +29,7 @@ export default function Dashboard() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [sdk]);
+  }, []);
 
   if (err && !data) return <div style={loadingStyle}>{err}</div>;
   if (!data) return <div style={loadingStyle}>Loading market data...</div>;
@@ -200,4 +198,4 @@ const card: React.CSSProperties = { background: '#111', padding: '10px', borderR
 const row: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '5px' };
 const newsRow: React.CSSProperties = { fontSize: '12px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const heatmap: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' };
-const loadingStyle: React.CSSProperties = { color: 'white', padding: '20px' };
+const loadingStyle: React.CSSProperties = { color: '#0b0e11', background: '#fff', padding: '20px', fontFamily: 'system-ui', minHeight: '100vh' };
