@@ -81,6 +81,7 @@ def build_snapshot() -> dict:
     insight = generate_insight(checklist, score)
     prediction = predict_market(market)
     decision = final_decision(sentiment, prediction.get("trend", ""))
+    decision_text = decision.get("message", "") if isinstance(decision, dict) else str(decision)
     alert = generate_alert(news, prediction)
 
     top_calls, top_puts, pcr, max_pain, strategy = [], [], 0, 0, {}
@@ -107,7 +108,7 @@ def build_snapshot() -> dict:
     return {
         "Sentiment": sentiment,
         "Score": score,
-        "DecisionText": decision,
+        "DecisionText": decision_text,
         "PredictionTrend": prediction.get("trend", ""),
         "PredictionConfidence": prediction.get("confidence", ""),
         "AlertType": (alert or {}).get("type", ""),
