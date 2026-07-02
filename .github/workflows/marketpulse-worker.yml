@@ -45,13 +45,22 @@ jobs:
           npm install -g @uipath/cli
           uip tools install @uipath/data-fabric-tool
 
-      - name: Log in to UiPath (non-interactive, client credentials)
+      - name: Restore UiPath interactive session
+        # Data Fabric rejects the confidential/client-credentials app identity
+        # outright ("unsupported robot type"), independent of scopes — this is
+        # a platform-level restriction, not something fixable via CLI flags.
+        # A real interactive user session IS accepted, so we restore one here
+        # instead of doing a fresh client-credentials login. This ties the
+        # automation to a personal UiPath account rather than a service
+        # identity — acceptable tradeoff for now, but the session will
+        # eventually need re-authenticating and re-uploading as this secret
+        # when its refresh token lapses.
         env:
-          UIPATH_CLIENT_ID: ${{ secrets.UIPATH_CLIENT_ID }}
-          UIPATH_CLIENT_SECRET: ${{ secrets.UIPATH_CLIENT_SECRET }}
-          UIPATH_TENANT_NAME: ${{ secrets.UIPATH_TENANT_NAME }}
+          UIP_AUTH_B64: ${{ secrets.UIP_AUTH_B64 }}
         run: |
-          uip login --client-id "$UIPATH_CLIENT_ID" --client-secret "$UIPATH_CLIENT_SECRET" --tenant "$UIPATH_TENANT_NAME" --output json
+          mkdir -p "$HOME/.uipath"
+          echo "$UIP_AUTH_B64" | base64 --decode > "$HOME/.uipath/.auth"
+          uip login refresh --output json
           uip login status --output json
 
       - name: Loop the worker every 60s for ~20 minutes
@@ -65,6 +74,7 @@ jobs:
           END=$((SECONDS + 20*60))
           while [ $SECONDS -lt $END ]; do
             echo "=== cycle at $(date -u +%H:%M:%S) UTC ==="
+            uip login refresh --output json > /dev/null || echo "token refresh failed, continuing anyway"
             python -m app.worker || echo "cycle failed, continuing to next tick"
             sleep 60
           done
