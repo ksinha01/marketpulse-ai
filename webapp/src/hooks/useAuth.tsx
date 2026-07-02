@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode; config: UiPathSDKConf
     try {
       await sdk.initialize();
     } catch (err) {
+      console.error('Login failed:', err);
       setError(err instanceof UiPathError ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);

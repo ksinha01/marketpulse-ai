@@ -1,4 +1,4 @@
 {
-  "scope": "DataFabric.Data.Read DataFabric.Schema.Read",
-  "clientId": "REPLACE_WITH_CLIENT_ID"
+  "scope": "OR.Assets.Read",
+  "clientId": "6d432490-35d3-4e9e-a0fa-3c68c700d689"
 }
