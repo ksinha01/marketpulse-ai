@@ -81,6 +81,11 @@ def build_snapshot() -> dict:
     insight = generate_insight(checklist, score)
     prediction = predict_market(market)
     decision = final_decision(sentiment, prediction.get("trend", ""))
+    # final_decision() returns a dict ({signal, type, message, action}), not a
+    # plain string — extract a displayable string instead of passing the raw
+    # object through (rendering a dict directly as JSX text crashes React
+    # with "Minified React error #31: Objects are not valid as a React
+    # child").
     decision_text = decision.get("message", "") if isinstance(decision, dict) else str(decision)
     alert = generate_alert(news, prediction)
 
