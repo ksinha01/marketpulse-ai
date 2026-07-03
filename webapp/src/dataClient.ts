@@ -1,15 +1,18 @@
-// Reads the snapshot as a plain JSON file from GitHub, NOT via the UiPath
-// SDK. The UiPath Orchestrator Assets OData API doesn't send CORS headers
-// for this app's origin — confirmed via browser devtools ("No
-// 'Access-Control-Allow-Origin' header is present on the requested
-// resource"), not assumed — so a direct browser fetch to Orchestrator is
-// blocked regardless of auth/scope. raw.githubusercontent.com sends
-// `Access-Control-Allow-Origin: *` on every file, sidestepping that
-// entirely. The worker still writes the "official" copy to an Orchestrator
-// asset too (see worker/app/asset_client.py) — this is purely a
-// browser-readable mirror of the same data, committed to the repo each
-// cycle by the worker's GitHub Actions job.
+// Reads the snapshot as a plain JSON file from GitHub via jsDelivr's CDN
+// mirror, NOT via the UiPath SDK. The UiPath Orchestrator Assets OData API
+// doesn't send CORS headers for this app's origin — confirmed via browser
+// devtools ("No 'Access-Control-Allow-Origin' header is present on the
+// requested resource"), not assumed — so a direct browser fetch to
+// Orchestrator is blocked regardless of auth/scope.
+//
+// jsDelivr (not raw.githubusercontent.com directly) is used specifically
+// because raw.githubusercontent.com's CDN caches responses for several
+// minutes regardless of cache-busting query params — a known platform
+// behavior. jsDelivr exposes an explicit purge API that the worker calls
+// after every push (see .github/workflows/marketpulse-worker.yml), so the
+// dashboard reflects new data within seconds instead of minutes.
 const SNAPSHOT_URL = 'https://cdn.jsdelivr.net/gh/ksinha01/marketpulse-ai@main/data/snapshot.json';
+
 export interface Snapshot {
   sentiment: string;
   score: number;
