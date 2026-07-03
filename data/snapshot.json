@@ -1,12 +1,12 @@
 {
-  "sentiment": "\ud83d\udfe1 SIDEWAYS",
-  "score": 34.5,
-  "decisionText": "No clear setup",
+  "sentiment": "\ud83d\udfe0 WEAK BEARISH",
+  "score": 2.6,
+  "decisionText": "Gap up but selling pressure",
   "predictionTrend": "\ud83d\udcc8 GAP UP",
   "predictionConfidence": "Medium",
-  "alertType": "\ud83d\ude80 STRONG BULLISH",
-  "alertMessage": "Bullish news + Gap Up expected",
-  "alertAction": "Look for buying opportunities",
+  "alertType": "\u26a0\ufe0f MIXED SIGNAL",
+  "alertMessage": "News and prediction are conflicting",
+  "alertAction": "Trade cautiously",
   "tradeType": "NO TRADE",
   "tradeReason": "No clear confirmation",
   "market": {
@@ -23,84 +23,60 @@
       "change": -5.28
     },
     "usd_inr": {
-      "price": 95.28,
-      "change": -0.1
+      "price": 95.32,
+      "change": -0.07
     },
     "us10y": {
       "price": 4.48,
-      "change": -0.4
+      "change": 0
     },
     "nifty": {
-      "price": 24339.75,
-      "change": 0.68
+      "price": 24327.2,
+      "change": 0.63
     },
     "banknifty": {
-      "price": 58090.35,
-      "change": 0.1
+      "price": 57983.8,
+      "change": -0.08
     },
     "finnifty": {
-      "price": 26987.55,
-      "change": 0.47
+      "price": 26951.9,
+      "change": 0.33
     },
     "indiavix": {
-      "price": 11.93,
-      "change": -2.9
+      "price": 11.88,
+      "change": -3.33
     },
     "gift_nifty": {
-      "price": 24339.75,
+      "price": 24327.2,
       "change": 0.66
     },
     "sectors": {
-      "IT": -0.03,
-      "AUTO": -0.39,
-      "FMCG": -0.36,
-      "METAL": -0.27,
-      "PHARMA": 1.29,
-      "ENERGY": -0.59,
-      "BANK": -0.45
+      "IT": 0.55,
+      "AUTO": -0.7,
+      "FMCG": -0.59,
+      "METAL": -0.32,
+      "PHARMA": 1.64,
+      "ENERGY": -0.9,
+      "BANK": -0.61
     }
   },
   "sectors": {
-    "IT": -0.03,
-    "AUTO": -0.39,
-    "FMCG": -0.36,
-    "METAL": -0.27,
-    "PHARMA": 1.29,
-    "ENERGY": -0.59,
-    "BANK": -0.45
+    "IT": 0.55,
+    "AUTO": -0.7,
+    "FMCG": -0.59,
+    "METAL": -0.32,
+    "PHARMA": 1.64,
+    "ENERGY": -0.9,
+    "BANK": -0.61
   },
   "news": [
     {
-      "title": "Fed's Warsh vows to 'disappoint' anyone who thinks he will tolerate inflation above 2%",
+      "title": "Same Fear, Different Fallout: Oil and Gold's Diverging Collapse",
       "impact": "Bearish",
-      "score": -3,
-      "category": "macro",
-      "weight": 3,
-      "time": "2026-07-01T17:41:39Z"
-    },
-    {
-      "title": "Corn Extending Gains to Wednesday, Following Post-USDA Report Strength",
-      "impact": "Bullish",
-      "score": 1.5,
-      "category": "equities",
-      "weight": 1.5,
-      "time": "2026-07-01T17:19:09Z"
-    },
-    {
-      "title": "Soybeans Holding onto Gains at Midday",
-      "impact": "Bullish",
-      "score": 1.5,
-      "category": "equities",
-      "weight": 1.5,
-      "time": "2026-07-01T17:19:09Z"
-    },
-    {
-      "title": "How Bowman Consulting Group Ltd. (BWMN) Connects Data Center Growth to Site Engineering and Liquid-Cooling Design",
-      "impact": "Bullish",
-      "score": 1,
-      "category": "general",
-      "weight": 1,
-      "time": "2026-07-01T17:27:15Z"
+      "score": -2,
+      "category": "geopolitics",
+      "weight": 2,
+      "time": "2026-07-01T19:00:00Z"
     }
   ],
   "checklist": [
@@ -118,7 +94,7 @@
     },
     {
       "name": "Momentum",
-      "signal": "Strong Bullish Alignment"
+      "signal": "Divergence (Caution)"
     },
     {
       "name": "VIX",
@@ -130,7 +106,7 @@
     },
     {
       "name": "High Impact News",
-      "signal": "Score: -0.5 | Events: 1"
+      "signal": "Score: -2.4 | Events: 1"
     }
   ],
   "strategy": {
@@ -140,6 +116,6 @@
     "execution": "Volatility breakout",
     "reason": "Uncertain direction"
   },
-  "insight": "Market is range-bound with mixed signals. Strength seen in: Nifty Trend, Momentum. Risks from: Global Cues. ",
-  "snapshotTime": "2026-07-03T05:16:53.357353+00:00"
+  "insight": "Market is under pressure with bearish signals. Strength seen in: Nifty Trend. Risks from: Global Cues. ",
+  "snapshotTime": "2026-07-03T06:05:42.640299+00:00"
 }
