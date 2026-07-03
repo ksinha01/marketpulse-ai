@@ -9,8 +9,7 @@
 // asset too (see worker/app/asset_client.py) — this is purely a
 // browser-readable mirror of the same data, committed to the repo each
 // cycle by the worker's GitHub Actions job.
-const SNAPSHOT_URL = 'https://raw.githubusercontent.com/ksinha01/marketpulse-ai/main/data/snapshot.json';
-
+const SNAPSHOT_URL = 'https://cdn.jsdelivr.net/gh/ksinha01/marketpulse-ai@main/data/snapshot.json';
 export interface Snapshot {
   sentiment: string;
   score: number;

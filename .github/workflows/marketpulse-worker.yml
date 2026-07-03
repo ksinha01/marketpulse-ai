@@ -77,6 +77,7 @@ jobs:
                 git commit -m "Update snapshot data [skip ci]"
               fi
               git push --force-with-lease || echo "snapshot push failed, continuing anyway"
+	      curl -s "https://purge.jsdelivr.net/gh/ksinha01/marketpulse-ai@main/data/snapshot.json" || echo "jsDelivr purge failed, continuing anyway"
             fi
             cd - > /dev/null
 
