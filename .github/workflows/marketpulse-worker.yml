@@ -72,11 +72,21 @@ jobs:
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
           SNAPSHOT_FILE: ${{ github.workspace }}/data/snapshot.json
         run: |
-          if [ -z "${{ github.event.schedule }}" ]; then
-            END_EPOCH=$(( $(date -u +%s) + 10*60 ))
+          # Always target the same daily cutoff (09:38 UTC = 3:08 PM IST),
+          # regardless of whether this run was triggered by the cron or
+          # manually — so a manual dispatch during market hours behaves
+          # exactly like the real scheduled run (useful if the cron was
+          # missed or you want to pick up where it left off). Only falls
+          # back to a short 10-minute test window if that cutoff has
+          # already passed for today (e.g. testing at night).
+          TODAY_CUTOFF=$(date -u -d "today 09:38" +%s)
+          NOW=$(date -u +%s)
+          if [ "$TODAY_CUTOFF" -gt "$NOW" ]; then
+            END_EPOCH=$TODAY_CUTOFF
           else
-            END_EPOCH=$(date -u -d "today 09:38" +%s)
+            END_EPOCH=$((NOW + 10*60))
           fi
+          echo "Now: $(date -u -d @$NOW), target end: $(date -u -d @$END_EPOCH)"
 
           while [ "$(date -u +%s)" -lt "$END_EPOCH" ]; do
             echo "=== cycle at $(date -u +%H:%M:%S) UTC ==="
