@@ -1,6 +1,6 @@
 {
   "sentiment": "\ud83d\udd34 STRONG BEARISH (TREND DAY)",
-  "score": -22.009999999999998,
+  "score": -21.08,
   "decisionText": "Global + Intraday aligned bearish",
   "predictionTrend": "\ud83d\udcc9 STRONG GAP DOWN",
   "predictionConfidence": "High",
@@ -19,8 +19,8 @@
       "change": -0.82
     },
     "vix": {
-      "price": 15.95,
-      "change": 1.08
+      "price": 15.96,
+      "change": 1.14
     },
     "usd_inr": {
       "price": 95.2,
@@ -48,7 +48,7 @@
     },
     "gift_nifty": {
       "price": 24270.85,
-      "change": -0.61
+      "change": -0.62
     },
     "sectors": {
       "IT": -0.16,
@@ -79,28 +79,12 @@
       "time": "2026-07-03T13:41:01Z"
     },
     {
-      "title": "IMF Warns That Tokenization Could Lead To Market Shocks",
-      "impact": "Bearish",
-      "score": -2.4,
-      "category": "geopolitics",
-      "weight": 2,
-      "time": "2026-07-03T13:29:00Z"
-    },
-    {
       "title": "Dow Jones Futures Fall Techs Rise After Tesla, Sandisk, AI Stocks Dive; Apple, Robinhood Flash Buy Signals",
       "impact": "Bullish",
-      "score": 2.25,
+      "score": 1.8,
       "category": "equities",
       "weight": 1.5,
       "time": "2026-07-03T13:44:50Z"
-    },
-    {
-      "title": "Here's Why Viking Therapeutics Stock Surged Higher in June",
-      "impact": "Bullish",
-      "score": 1.5,
-      "category": "general",
-      "weight": 1,
-      "time": "2026-07-03T13:45:39Z"
     }
   ],
   "checklist": [
@@ -130,7 +114,7 @@
     },
     {
       "name": "High Impact News",
-      "signal": "Score: -2.01 | Events: 3"
+      "signal": "Score: -1.08 | Events: 1"
     }
   ],
   "strategy": {
@@ -141,5 +125,5 @@
     "reason": "Downtrend confirmation"
   },
   "insight": "Market is under pressure with bearish signals. Risks from: Global Cues. ",
-  "snapshotTime": "2026-07-03T14:13:04.289891+00:00"
+  "snapshotTime": "2026-07-03T14:29:49.600947+00:00"
 }
