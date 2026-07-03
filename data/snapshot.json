@@ -1,14 +1,14 @@
 {
-  "sentiment": "\ud83d\udfe0 WEAK BEARISH",
-  "score": 2.6,
-  "decisionText": "Gap up but selling pressure",
-  "predictionTrend": "\ud83d\udcc8 GAP UP",
-  "predictionConfidence": "Medium",
-  "alertType": "\u26a0\ufe0f MIXED SIGNAL",
-  "alertMessage": "News and prediction are conflicting",
-  "alertAction": "Trade cautiously",
-  "tradeType": "NO TRADE",
-  "tradeReason": "No clear confirmation",
+  "sentiment": "\ud83d\udd34 STRONG BEARISH (TREND DAY)",
+  "score": -22.009999999999998,
+  "decisionText": "Global + Intraday aligned bearish",
+  "predictionTrend": "\ud83d\udcc9 STRONG GAP DOWN",
+  "predictionConfidence": "High",
+  "alertType": "\ud83d\udfe1 NEUTRAL",
+  "alertMessage": "No strong edge",
+  "alertAction": "Wait for clear setup",
+  "tradeType": "PUT",
+  "tradeReason": "Bearish trend + gap down",
   "market": {
     "sp500": {
       "price": 7483.24,
@@ -19,70 +19,94 @@
       "change": -0.82
     },
     "vix": {
-      "price": 16.15,
-      "change": -5.28
+      "price": 15.95,
+      "change": 1.08
     },
     "usd_inr": {
-      "price": 95.32,
-      "change": -0.07
+      "price": 95.2,
+      "change": -0.19
     },
     "us10y": {
       "price": 4.48,
       "change": 0
     },
     "nifty": {
-      "price": 24327.2,
-      "change": 0.63
+      "price": 24270.85,
+      "change": 0.39
     },
     "banknifty": {
-      "price": 57983.8,
-      "change": -0.08
+      "price": 57938.5,
+      "change": -0.16
     },
     "finnifty": {
-      "price": 26951.9,
-      "change": 0.33
+      "price": 26875.05,
+      "change": 0.05
     },
     "indiavix": {
-      "price": 11.88,
-      "change": -3.33
+      "price": 11.8,
+      "change": -3.98
     },
     "gift_nifty": {
-      "price": 24327.2,
-      "change": 0.66
+      "price": 24270.85,
+      "change": -0.61
     },
     "sectors": {
-      "IT": 0.55,
-      "AUTO": -0.7,
-      "FMCG": -0.59,
-      "METAL": -0.32,
-      "PHARMA": 1.64,
-      "ENERGY": -0.9,
-      "BANK": -0.61
+      "IT": -0.16,
+      "AUTO": -1.15,
+      "FMCG": -0.56,
+      "METAL": -0.44,
+      "PHARMA": 1.35,
+      "ENERGY": -1.17,
+      "BANK": -0.69
     }
   },
   "sectors": {
-    "IT": 0.55,
-    "AUTO": -0.7,
-    "FMCG": -0.59,
-    "METAL": -0.32,
-    "PHARMA": 1.64,
-    "ENERGY": -0.9,
-    "BANK": -0.61
+    "IT": -0.16,
+    "AUTO": -1.15,
+    "FMCG": -0.56,
+    "METAL": -0.44,
+    "PHARMA": 1.35,
+    "ENERGY": -1.17,
+    "BANK": -0.69
   },
   "news": [
     {
-      "title": "Same Fear, Different Fallout: Oil and Gold's Diverging Collapse",
+      "title": "Kinross Gold\u2019s (KGC) Multibagger Potential In Tact Despite Downward Target Price Revision",
       "impact": "Bearish",
-      "score": -2,
+      "score": -2.4,
       "category": "geopolitics",
       "weight": 2,
-      "time": "2026-07-01T19:00:00Z"
+      "time": "2026-07-03T13:41:01Z"
+    },
+    {
+      "title": "IMF Warns That Tokenization Could Lead To Market Shocks",
+      "impact": "Bearish",
+      "score": -2.4,
+      "category": "geopolitics",
+      "weight": 2,
+      "time": "2026-07-03T13:29:00Z"
+    },
+    {
+      "title": "Dow Jones Futures Fall Techs Rise After Tesla, Sandisk, AI Stocks Dive; Apple, Robinhood Flash Buy Signals",
+      "impact": "Bullish",
+      "score": 2.25,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-03T13:44:50Z"
+    },
+    {
+      "title": "Here's Why Viking Therapeutics Stock Surged Higher in June",
+      "impact": "Bullish",
+      "score": 1.5,
+      "category": "general",
+      "weight": 1,
+      "time": "2026-07-03T13:45:39Z"
     }
   ],
   "checklist": [
     {
       "name": "Nifty Trend",
-      "signal": "Bullish"
+      "signal": "Sideways"
     },
     {
       "name": "BankNifty",
@@ -106,16 +130,16 @@
     },
     {
       "name": "High Impact News",
-      "signal": "Score: -2.4 | Events: 1"
+      "signal": "Score: -2.01 | Events: 3"
     }
   ],
   "strategy": {
-    "strategy": "Straddle",
-    "setup": "Buy CE + PE",
-    "confidence": "Medium",
-    "execution": "Volatility breakout",
-    "reason": "Uncertain direction"
+    "strategy": "Bear Put Spread",
+    "setup": "Buy ATM PE, Sell OTM PE",
+    "confidence": "High",
+    "execution": "Buy ATM Put on breakdown",
+    "reason": "Downtrend confirmation"
   },
-  "insight": "Market is under pressure with bearish signals. Strength seen in: Nifty Trend. Risks from: Global Cues. ",
-  "snapshotTime": "2026-07-03T06:05:42.640299+00:00"
+  "insight": "Market is under pressure with bearish signals. Risks from: Global Cues. ",
+  "snapshotTime": "2026-07-03T14:13:04.289891+00:00"
 }
