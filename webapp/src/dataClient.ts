@@ -1,16 +1,15 @@
-// Reads the snapshot as a plain JSON file from GitHub via jsDelivr's CDN
-// mirror, NOT via the UiPath SDK. Confirmed via HAR file inspection: the
-// Orchestrator Assets OData API sends zero Access-Control-* headers on its
-// CORS preflight response, for any identity type tested (confidential app,
-// interactive user) — a platform-side gap, not a config issue on our end.
-//
-// jsDelivr's purge API is rate-limited to roughly once every 5-7 minutes
-// per file (confirmed via its own API response: "throttled": true with a
-// counting-down "throttlingReset" in seconds) — calling it more often than
-// that doesn't make data fresher, it just returns "finished" without
-// actually invalidating anything. So the realistic effective freshness
-// here is ~5-7 minutes behind the worker's actual writes, not near-real-time.
-const SNAPSHOT_URL = 'https://cdn.jsdelivr.net/gh/ksinha01/marketpulse-ai@main/data/snapshot.json';
+// Reads the snapshot through a Cloudflare Worker proxy, NOT directly from
+// GitHub or the UiPath SDK. Two things this works around:
+//   1. UiPath's Orchestrator Assets OData API sends zero CORS headers on
+//      preflight, for any identity type — confirmed via HAR inspection.
+//   2. raw.githubusercontent.com and jsDelivr both cache responses for
+//      several minutes regardless of cache-busting query params or purge
+//      calls (jsDelivr's purge is itself throttled to ~5-7 min).
+// The Worker proxies GitHub's live Contents API instead (not the cached
+// raw-file CDN), with Cache-Control: no-store, giving genuinely fresh data
+// within seconds of the worker's actual writes. See /cloudflare-worker in
+// the repo for the proxy's own source and setup steps.
+const SNAPSHOT_URL = 'https://marketpulse-proxy.marketpulse-ai.workers.dev';
 
 export interface Snapshot {
   sentiment: string;

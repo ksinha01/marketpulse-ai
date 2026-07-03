@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react';
 import { fetchLatestSnapshot } from './dataClient';
 import type { Snapshot } from './dataClient';
 
-// jsDelivr's purge is rate-limited to ~5-7 min per file regardless of how
-// often we ask, so polling faster than that doesn't get fresher data —
-// it just wastes requests. 60s is a reasonable compromise: fast enough to
-// catch a refresh soon after it actually happens, not so fast it's pointless.
-const POLL_MS = 60_000;
+// The Cloudflare Worker proxy gives genuinely fresh data (no CDN caching
+// in the way), so this can poll near the worker's own ~30s write cadence
+// without wasting requests the way it would against a throttled CDN.
+const POLL_MS = 20_000;
 
 export default function Dashboard() {
   const [data, setData] = useState<Snapshot | null>(null);
