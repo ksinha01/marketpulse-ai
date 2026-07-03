@@ -1,16 +1,15 @@
 // Reads the snapshot as a plain JSON file from GitHub via jsDelivr's CDN
-// mirror, NOT via the UiPath SDK. The UiPath Orchestrator Assets OData API
-// doesn't send CORS headers for this app's origin — confirmed via browser
-// devtools ("No 'Access-Control-Allow-Origin' header is present on the
-// requested resource"), not assumed — so a direct browser fetch to
-// Orchestrator is blocked regardless of auth/scope.
+// mirror, NOT via the UiPath SDK. Confirmed via HAR file inspection: the
+// Orchestrator Assets OData API sends zero Access-Control-* headers on its
+// CORS preflight response, for any identity type tested (confidential app,
+// interactive user) — a platform-side gap, not a config issue on our end.
 //
-// jsDelivr (not raw.githubusercontent.com directly) is used specifically
-// because raw.githubusercontent.com's CDN caches responses for several
-// minutes regardless of cache-busting query params — a known platform
-// behavior. jsDelivr exposes an explicit purge API that the worker calls
-// after every push (see .github/workflows/marketpulse-worker.yml), so the
-// dashboard reflects new data within seconds instead of minutes.
+// jsDelivr's purge API is rate-limited to roughly once every 5-7 minutes
+// per file (confirmed via its own API response: "throttled": true with a
+// counting-down "throttlingReset" in seconds) — calling it more often than
+// that doesn't make data fresher, it just returns "finished" without
+// actually invalidating anything. So the realistic effective freshness
+// here is ~5-7 minutes behind the worker's actual writes, not near-real-time.
 const SNAPSHOT_URL = 'https://cdn.jsdelivr.net/gh/ksinha01/marketpulse-ai@main/data/snapshot.json';
 
 export interface Snapshot {
@@ -34,9 +33,6 @@ export interface Snapshot {
 }
 
 export async function fetchLatestSnapshot(): Promise<Snapshot | null> {
-  // Cache-bust — raw.githubusercontent.com and intermediate CDNs cache
-  // aggressively; without this the dashboard could show stale data well
-  // past when the worker actually updated it.
   const resp = await fetch(`${SNAPSHOT_URL}?t=${Date.now()}`, { cache: 'no-store' });
   if (!resp.ok) {
     if (resp.status === 404) return null; // worker hasn't written a snapshot yet

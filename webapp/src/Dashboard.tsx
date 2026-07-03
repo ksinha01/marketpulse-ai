@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { fetchLatestSnapshot } from './dataClient';
 import type { Snapshot } from './dataClient';
 
-const POLL_MS = 15_000; // jsDelivr read; the worker itself writes every ~30s during its scheduled market-hours window
+// jsDelivr's purge is rate-limited to ~5-7 min per file regardless of how
+// often we ask, so polling faster than that doesn't get fresher data —
+// it just wastes requests. 60s is a reasonable compromise: fast enough to
+// catch a refresh soon after it actually happens, not so fast it's pointless.
+const POLL_MS = 60_000;
 
 export default function Dashboard() {
   const [data, setData] = useState<Snapshot | null>(null);
