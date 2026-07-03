@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchLatestSnapshot } from './dataClient';
 import type { Snapshot } from './dataClient';
 
-const POLL_MS = 30_000; // GitHub raw file read; the worker itself writes every ~1 min on its own schedule
+const POLL_MS = 15_000; // jsDelivr read; the worker itself writes every ~30s during its scheduled market-hours window
 
 export default function Dashboard() {
   const [data, setData] = useState<Snapshot | null>(null);

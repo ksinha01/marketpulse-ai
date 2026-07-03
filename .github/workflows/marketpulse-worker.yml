@@ -1,12 +1,22 @@
 name: marketpulse-worker
 
+# Runs once daily, Mon-Fri, covering Indian market hours: starts 9:10 AM
+# IST, stops at 3:08 PM IST. That's a single ~6-hour job — right at
+# GitHub Actions' hard per-job cap of 6 hours. Rather than count a fixed
+# duration in seconds from script start (which would eat into that budget
+# via setup steps — checkout, pip/npm installs, login — before the loop
+# even begins), the loop instead checks the actual wall-clock time each
+# cycle and stops at a fixed cutoff (09:38 UTC = 3:08 PM IST). This is more
+# robust against setup-time variance, and the 2-minute buffer before the
+# true 6-hour boundary (3:10 PM IST) protects against the job getting
+# forcibly killed mid-cycle if anything runs slightly long.
 on:
   schedule:
-    - cron: "*/19 * * * *"
+    - cron: "40 3 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
-  contents: write   # needed so the worker can commit/push data/snapshot.json
+  contents: write
 
 concurrency:
   group: marketpulse-worker
@@ -15,7 +25,7 @@ concurrency:
 jobs:
   run-worker:
     runs-on: ubuntu-latest
-    timeout-minutes: 21
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +62,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Loop the worker every 60s for ~20 minutes
+      - name: Loop every 30s until 3:08 PM IST (09:38 UTC)
         working-directory: worker
         env:
           ASSET_KEY: ${{ secrets.ASSET_KEY }}
@@ -62,8 +72,13 @@ jobs:
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
           SNAPSHOT_FILE: ${{ github.workspace }}/data/snapshot.json
         run: |
-          END=$((SECONDS + 20*60))
-          while [ $SECONDS -lt $END ]; do
+          if [ -z "${{ github.event.schedule }}" ]; then
+            END_EPOCH=$(( $(date -u +%s) + 10*60 ))
+          else
+            END_EPOCH=$(date -u -d "today 09:38" +%s)
+          fi
+
+          while [ "$(date -u +%s)" -lt "$END_EPOCH" ]; do
             echo "=== cycle at $(date -u +%H:%M:%S) UTC ==="
             python -m app.worker || echo "cycle failed, continuing to next tick"
 
@@ -81,5 +96,5 @@ jobs:
             fi
             cd - > /dev/null
 
-            sleep 60
+            sleep 30
           done
