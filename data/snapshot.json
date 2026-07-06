@@ -1,140 +1,132 @@
 {
-  "sentiment": "\ud83d\udfe1 SIDEWAYS",
-  "score": 37.6,
+  "sentiment": "\ud83d\udd34 STRONG BEARISH (TREND DAY)",
+  "score": -76.6,
   "decisionText": "No clear setup",
-  "predictionTrend": "\ud83d\udcc9 STRONG GAP DOWN",
-  "predictionConfidence": "High",
-  "alertType": "\ud83d\udea8 HIGH RISK",
-  "alertMessage": "Bearish news spike + Gap Down expected",
-  "alertAction": "Avoid longs / consider hedging",
+  "predictionTrend": "\ud83d\udfe1 SIDEWAYS",
+  "predictionConfidence": "Low",
+  "alertType": "\ud83d\udfe1 NEUTRAL",
+  "alertMessage": "No strong edge",
+  "alertAction": "Wait for clear setup",
   "tradeType": "NO TRADE",
   "tradeReason": "No clear confirmation",
   "market": {
     "sp500": {
-      "price": 7483.24,
-      "change": -0.16
+      "price": 7498.96,
+      "change": 0.02
     },
     "nasdaq": {
-      "price": 25832.67,
-      "change": -0.82
+      "price": 25690.9,
+      "change": -0.01
     },
     "vix": {
-      "price": 15.81,
+      "price": 16.64,
       "change": 0
     },
     "usd_inr": {
-      "price": 95.33,
-      "change": 0.14
+      "price": 96.51,
+      "change": -0.05
     },
     "us10y": {
-      "price": 4.49,
-      "change": -0.4
+      "price": 4.66,
+      "change": 0.37
     },
     "nifty": {
-      "price": 24400.4,
-      "change": 0.53
+      "price": 23860.7,
+      "change": -0.56
     },
     "banknifty": {
-      "price": 58324.4,
-      "change": 0.67
+      "price": 56414.75,
+      "change": -1.25
     },
     "finnifty": {
-      "price": 27018.5,
-      "change": 0.53
+      "price": 25966,
+      "change": -0.85
     },
     "indiavix": {
-      "price": 11.87,
-      "change": 0.57
+      "price": 13.44,
+      "change": 1.09
     },
     "gift_nifty": {
-      "price": 24400.4,
-      "change": -0.39
+      "price": 23860.7,
+      "change": 0.0
     },
     "sectors": {
-      "IT": -0.75,
-      "AUTO": 0.74,
-      "FMCG": 0.16,
-      "METAL": 0.57,
-      "PHARMA": -0.24,
-      "ENERGY": 0.45,
-      "BANK": 0.61
+      "IT": -0.25,
+      "AUTO": 1.23,
+      "FMCG": -0.22,
+      "METAL": -0.5,
+      "PHARMA": 0.19,
+      "ENERGY": -0.45,
+      "BANK": -0.68
     }
   },
   "sectors": {
-    "IT": -0.75,
-    "AUTO": 0.74,
-    "FMCG": 0.16,
-    "METAL": 0.57,
-    "PHARMA": -0.24,
-    "ENERGY": 0.45,
-    "BANK": 0.61
+    "IT": -0.25,
+    "AUTO": 1.23,
+    "FMCG": -0.22,
+    "METAL": -0.5,
+    "PHARMA": 0.19,
+    "ENERGY": -0.45,
+    "BANK": -0.68
   },
   "news": [
     {
-      "title": "Mortgage and refinance interest rates today, Friday, July 3: Rates mostly higher again today",
+      "title": "Norway's Oil Output Beats Forecasts as Hormuz Traffic Stays Near Crisis Lows",
       "impact": "Bullish",
-      "score": 3,
-      "category": "macro",
-      "weight": 3,
-      "time": "2026-07-03T10:00:00Z"
-    },
-    {
-      "title": "Oil Price Crash: 1 Top Oil Stock to Buy Now",
-      "impact": "Bearish",
-      "score": -2,
+      "score": 2,
       "category": "geopolitics",
       "weight": 2,
-      "time": "2026-07-04T17:37:00Z"
+      "time": "2026-07-21T20:00:00Z"
     },
     {
-      "title": "New Research Says: The Biggest Gains of AI Won't Go to AI Stocks. These 2 ETFs Could Be Better Buys.",
+      "title": "Tornado watch issued for NYC area. How to insure your home against tornado damage.",
       "impact": "Bullish",
       "score": 1.5,
       "category": "equities",
       "weight": 1.5,
-      "time": "2026-07-04T17:20:00Z"
+      "time": "2025-08-12T15:05:46Z"
     },
     {
-      "title": "Here\u2019s Why Analysts Are Still Bullish On Alcoa Corp (AA) Stock Despite The Selloff",
-      "impact": "Bearish",
-      "score": -1,
-      "category": "general",
-      "weight": 1,
-      "time": "2026-07-04T19:15:33Z"
-    },
-    {
-      "title": "Comcast (CMCSA) Stock Has Fallen 50%, Why Are Analysts Suddenly Turning Bullish On The Stock?",
-      "impact": "Bearish",
-      "score": -1,
-      "category": "general",
-      "weight": 1,
-      "time": "2026-07-04T19:15:50Z"
-    },
-    {
-      "title": "DGRO vs. VIG: Which Dividend-Growth ETF Compounds Your Income Faster?",
+      "title": "Stock market today: Dow, S&P 500, Nasdaq jump as semiconductor stocks surge",
       "impact": "Bullish",
-      "score": 1,
+      "score": 1.5,
+      "category": "equities",
+      "weight": 1.5,
+      "time": "2026-07-21T08:46:31Z"
+    },
+    {
+      "title": "The UFO ETF Is Crashing Back to Earth as SpaceX Stock Treads Water Below $135",
+      "impact": "Bearish",
+      "score": -1,
       "category": "general",
       "weight": 1,
-      "time": "2026-07-04T17:21:57Z"
+      "time": "2026-07-21T20:36:11Z"
+    },
+    {
+      "title": "Why Lockheed Martin Stock Dropped Tuesday Morning",
+      "impact": "Bearish",
+      "score": -1,
+      "category": "general",
+      "weight": 1,
+      "time": "2026-07-21T19:25:49Z"
     }
   ],
   "checklist": [
     {
       "name": "Nifty Trend",
-      "signal": "Bullish"
+      "signal": "Bearish"
     },
     {
       "name": "BankNifty",
-      "signal": "Neutral"
+      "signal": "Strong Weakness"
     },
     {
       "name": "FinNifty",
-      "signal": "Neutral"
+      "signal": "Institutional Selling"
     },
     {
       "name": "Momentum",
-      "signal": "Strong Bullish Alignment"
+      "signal": "Strong Bearish Alignment"
     },
     {
       "name": "VIX",
@@ -142,20 +134,20 @@
     },
     {
       "name": "Global Cues",
-      "signal": "Bearish Pressure"
+      "signal": "Mixed"
     },
     {
       "name": "High Impact News",
-      "signal": "Score: 2.6 | Events: 2"
+      "signal": "Score: 3.4 | Events: 1"
     }
   ],
   "strategy": {
-    "strategy": "Straddle",
-    "setup": "Buy CE + PE",
+    "strategy": "Iron Condor",
+    "setup": "Sell OTM CE + PE",
     "confidence": "Medium",
-    "execution": "Volatility breakout",
-    "reason": "Uncertain direction"
+    "execution": "Range trading",
+    "reason": "Balanced OI"
   },
-  "insight": "Market is range-bound with mixed signals. Strength seen in: Nifty Trend, Momentum. Risks from: Global Cues. ",
-  "snapshotTime": "2026-07-06T04:56:45.506003+00:00"
+  "insight": "Market is under pressure with bearish signals. Risks from: Nifty Trend, Momentum. ",
+  "snapshotTime": "2026-07-23T07:17:52.299099+00:00"
 }
