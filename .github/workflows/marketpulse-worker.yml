@@ -90,6 +90,7 @@ jobs:
 
           while [ "$(date -u +%s)" -lt "$END_EPOCH" ]; do
             echo "=== cycle at $(date -u +%H:%M:%S) UTC ==="
+            uip login refresh --output json > /dev/null || echo "token refresh failed, continuing anyway"
             python -m app.worker || echo "cycle failed, continuing to next tick"
 
             cd "$GITHUB_WORKSPACE"
